@@ -1,0 +1,26 @@
+{
+  "name": "Payment Card Lab",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "forwardPorts": [8765],
+  "portsAttributes": {
+    "8765": {
+      "label": "Payment Card Lab UI",
+      "onAutoForward": "openPreview",
+      "visibility": "public"
+    }
+  },
+  "postCreateCommand": "pip install -r payment-card-lab/requirements.txt 2>/dev/null || true",
+  "postAttachCommand": {
+    "welcome": "bash -lc 'echo; echo \"==================================================\"; echo \"  Payment Card Lab listo. Para arrancar:\"; echo \"    cd payment-card-lab && python3 api.py\"; echo \"  Codespaces abrira la UI automaticamente.\"; echo \"==================================================\"; echo'"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}
