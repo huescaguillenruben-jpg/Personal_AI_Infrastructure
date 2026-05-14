@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payment Card Lab</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="logo">◊</span>
+    <span class="title">Payment Card Lab</span>
+    <span class="env" id="env">test</span>
+  </div>
+  <div class="nav">
+    <span id="health-pill" class="pill">api: connecting…</span>
+  </div>
+</header>
+
+<main>
+
+<section class="panel">
+  <h2>1 — Emitir tarjeta</h2>
+  <p class="hint">Crea titular, abre cuenta y emite una tarjeta lista para usar. La cuenta se fondea con el monto que pongas.</p>
+  <div class="form">
+    <label>Titular <input id="holder-name" value="Ruben Huesca"></label>
+    <label>País <input id="holder-country" value="MX" maxlength="2" style="width:80px"></label>
+    <label>Tipo
+      <select id="acct-type">
+        <option value="checking">Débito (checking)</option>
+        <option value="credit">Crédito</option>
+      </select>
+    </label>
+    <label>Depósito inicial (MXN) <input id="deposit" type="number" value="50000"></label>
+    <button id="btn-issue" class="primary">Emitir tarjeta</button>
+  </div>
+
+  <div class="card-wrap" id="card-wrap" hidden>
+    <div class="card-plastic">
+      <div class="chip"></div>
+      <div class="pan" id="card-pan">····  ····  ····  ····</div>
+      <div class="row">
+        <div><span class="lbl">VENCE</span><div id="card-exp">··/··</div></div>
+        <div><span class="lbl">CVV</span><div id="card-cvv">···</div></div>
+      </div>
+      <div class="holder" id="card-holder">NOMBRE TITULAR</div>
+      <div class="brand-mark">visa</div>
+    </div>
+    <div class="card-meta">
+      <div><span class="k">PSN</span><span id="m-psn">—</span></div>
+      <div><span class="k">Cuenta</span><span id="m-acct">—</span></div>
+      <div><span class="k">Saldo posted</span><span id="m-posted">—</span></div>
+      <div><span class="k">Hold</span><span id="m-held">—</span></div>
+      <div><span class="k">Disponible</span><span id="m-avail" class="highlight">—</span></div>
+      <button id="btn-refresh" class="small">↻ refresh</button>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>2 — Cargar tarjeta</h2>
+  <p class="hint">Elige el canal y el monto. El emisor evalúa fraude, EMV, 3DS y fondos antes de aprobar.</p>
+  <div class="form">
+    <label>Canal
+      <select id="pos">
+        <option value="swipe">Swipe (banda)</option>
+        <option value="chip">Chip EMV (ARQC)</option>
+        <option value="contactless">Contactless (plástico NFC)</option>
+        <option value="ecommerce">E-commerce (CNP)</option>
+      </select>
+    </label>
+    <label>Monto (MXN) <input id="amount" type="number" value="120"></label>
+    <label>MCC <input id="mcc" value="5812" maxlength="4" style="width:90px"></label>
+    <button id="btn-charge" class="primary" disabled>Cobrar</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>3 — Wallet móvil + tap NFC</h2>
+  <p class="hint">Provisiona la tarjeta en un wallet (genera DPAN) y haz tap.</p>
+  <div class="form">
+    <label>Provider
+      <select id="wallet-provider">
+        <option>apple_pay</option>
+        <option>google_pay</option>
+        <option>samsung_pay</option>
+      </select>
+    </label>
+    <button id="btn-provision" disabled>+ Agregar al wallet</button>
+    <label>DPAN <input id="dpan" disabled placeholder="(provisiona primero)"></label>
+    <label>Monto NFC (MXN) <input id="tap-amount" type="number" value="80"></label>
+    <button id="btn-tap" class="primary" disabled>Tap to Pay</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>4 — Transacciones</h2>
+  <div class="actions">
+    <button id="btn-clearing">Correr clearing batch</button>
+    <button id="btn-reload">↻ recargar</button>
+  </div>
+  <table id="txn-table">
+    <thead>
+      <tr>
+        <th>txn_id</th><th>PAN</th><th>Monto</th><th>Canal</th>
+        <th>Estado</th><th>RC</th><th>Auth</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section class="panel info">
+  <h2>Referencia rápida — códigos ISO 8583</h2>
+  <table class="rc">
+    <tr><th>00</th><td>Aprobada</td></tr>
+    <tr><th>05</th><td>Do not honor (genérico)</td></tr>
+    <tr><th>14</th><td>PAN inválido / no del emisor</td></tr>
+    <tr><th>15</th><td>Emisor desconocido</td></tr>
+    <tr><th>43</th><td>Tarjeta robada</td></tr>
+    <tr><th>51</th><td>Fondos insuficientes</td></tr>
+    <tr><th>54</th><td>Vencimiento incorrecto</td></tr>
+    <tr><th>61</th><td>Excede límite</td></tr>
+    <tr><th>62</th><td>Tarjeta restringida</td></tr>
+    <tr><th>65</th><td>Excede frecuencia (velocidad)</td></tr>
+    <tr><th>82</th><td>CVV incorrecto</td></tr>
+    <tr><th>85</th><td>Falla criptográfica (ARQC / token)</td></tr>
+    <tr><th>1A</th><td>Requiere SCA / 3DS</td></tr>
+  </table>
+</section>
+
+</main>
+
+<div id="toast" hidden></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
