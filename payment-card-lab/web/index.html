@@ -22,20 +22,23 @@
 <main>
 
 <section class="panel">
-  <h2>1 — Emitir tarjeta</h2>
-  <p class="hint">Crea titular, abre cuenta y emite una tarjeta lista para usar. La cuenta se fondea con el monto que pongas.</p>
-  <div class="form">
-    <label>Titular <input id="holder-name" value="Ruben Huesca"></label>
-    <label>País <input id="holder-country" value="MX" maxlength="2" style="width:80px"></label>
-    <label>Tipo
-      <select id="acct-type">
-        <option value="checking">Débito (checking)</option>
-        <option value="credit">Crédito</option>
-      </select>
-    </label>
-    <label>Depósito inicial (MXN) <input id="deposit" type="number" value="50000"></label>
-    <button id="btn-issue" class="primary">Emitir tarjeta</button>
-  </div>
+  <h2>1 — Tu tarjeta</h2>
+  <p class="hint">Ya hay una tarjeta emitida automáticamente al arrancar el server. Si quieres otra, llena el form y dale a "Emitir nueva".</p>
+  <details>
+    <summary class="hint" style="cursor:pointer">Emitir tarjeta nueva (opcional)</summary>
+    <div class="form" style="margin-top:12px">
+      <label>Titular <input id="holder-name" value="Ruben Huesca"></label>
+      <label>País <input id="holder-country" value="MX" maxlength="2" style="width:80px"></label>
+      <label>Tipo
+        <select id="acct-type">
+          <option value="checking">Débito (checking)</option>
+          <option value="credit">Crédito</option>
+        </select>
+      </label>
+      <label>Depósito inicial (MXN) <input id="deposit" type="number" value="50000"></label>
+      <button id="btn-issue">Emitir nueva</button>
+    </div>
+  </details>
 
   <div class="card-wrap" id="card-wrap" hidden>
     <div class="card-plastic">

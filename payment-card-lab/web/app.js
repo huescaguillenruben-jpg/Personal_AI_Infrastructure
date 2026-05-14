@@ -46,6 +46,29 @@ async function checkHealth() {
   }
 }
 
+// --- starter card: cargada en cuanto abre la página -----------------
+async function loadStarter() {
+  try {
+    const s = await api("GET", "/starter");
+    state.card = { pan: s.pan, expiry: s.expiry, cvv: s.cvv, psn: s.psn };
+    state.account_id = s.account_id;
+    $("#holder-name").value = s.holder_name;
+    $("#card-pan").textContent = fmtPan(s.pan);
+    $("#card-exp").textContent = s.expiry;
+    $("#card-cvv").textContent = s.cvv;
+    $("#card-holder").textContent = s.holder_name.toUpperCase();
+    $("#m-psn").textContent = s.psn;
+    $("#m-acct").textContent = s.account_id;
+    $("#card-wrap").hidden = false;
+    await refreshBalance();
+    $("#btn-charge").disabled = false;
+    $("#btn-provision").disabled = false;
+    toast(`Tarjeta lista: ${s.pan_masked}  ·  CVV ${s.cvv}  ·  vence ${s.expiry}`, "success");
+  } catch (e) {
+    // Si no hay starter card (lab corriendo sin api.py), no hacemos nada.
+  }
+}
+
 // --- emitir tarjeta -------------------------------------------------
 async function issueCard() {
   $("#btn-issue").disabled = true;
@@ -236,5 +259,6 @@ $("#btn-clearing").onclick  = runClearing;
 $("#btn-reload").onclick    = loadTxns;
 
 checkHealth();
+loadStarter();
 loadTxns();
 setInterval(checkHealth, 15000);

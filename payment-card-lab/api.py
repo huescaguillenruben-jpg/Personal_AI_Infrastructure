@@ -54,6 +54,15 @@ ACQ.network = NET
 DEFAULT_MERCHANT = ACQ.onboard_merchant("Lab Storefront", mcc="5812")
 DEFAULT_TERMINAL = Terminal.deploy(ACQ, DEFAULT_MERCHANT)
 
+# Starter card: emitida al arrancar para que la UI tenga algo listo.
+STARTER_HOLDER = ISSUER.register_holder("Ruben Huesca")
+STARTER_ACCOUNT = ISSUER.open_account(
+    STARTER_HOLDER, AccountType.CHECKING,
+    initial_deposit=Money(50_000_00),     # $50,000 MXN
+)
+STARTER_CARD = ISSUER.issue_card(STARTER_ACCOUNT)
+ISSUER.activate_card(STARTER_CARD.pan)
+
 WEB_ROOT = os.path.join(os.path.dirname(__file__), "web")
 
 
@@ -119,6 +128,17 @@ class Handler(BaseHTTPRequestHandler):
                     "issuer_bin": ISSUER.config.bin,
                     "issuer_name": ISSUER.config.name,
                     "merchant_id": DEFAULT_MERCHANT.merchant_id,
+                })
+            if path == "/starter":
+                return self._json(200, {
+                    "holder_name": STARTER_HOLDER.full_name,
+                    "holder_id": STARTER_HOLDER.holder_id,
+                    "account_id": STARTER_ACCOUNT.account_id,
+                    "pan": STARTER_CARD.pan,
+                    "expiry": STARTER_CARD.expiry_mmYY,
+                    "cvv": STARTER_CARD.cvv,
+                    "psn": STARTER_CARD.card_seq_num,
+                    "pan_masked": mask_pan(STARTER_CARD.pan),
                 })
             if path.startswith("/accounts/"):
                 acc = ISSUER.ledger.get(path.split("/")[-1])
@@ -299,15 +319,26 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main(host: str = "127.0.0.1", port: int = 8765) -> None:
-    print("=" * 60)
-    print(f"  Lab API + UI en  http://{host}:{port}")
-    print("=" * 60)
+    line = "=" * 64
+    print(line)
+    print(f"  Payment Card Lab — API + UI en  http://{host}:{port}")
+    print(line)
     print(f"  Issuer        : {ISSUER.config.name}  (BIN {ISSUER.config.bin})")
     print(f"  Merchant      : {DEFAULT_MERCHANT.name}  ({DEFAULT_MERCHANT.merchant_id})")
     print(f"  Terminal      : {DEFAULT_TERMINAL.terminal_id}")
-    print(f"  UI            : abre http://{host}:{port}/ en tu browser")
-    print(f"  API health    : http://{host}:{port}/health")
-    print("=" * 60)
+    print(line)
+    print("  TARJETA LISTA PARA USAR (emitida automaticamente):")
+    print(line)
+    print(f"  Titular       : {STARTER_HOLDER.full_name}")
+    print(f"  PAN           : {STARTER_CARD.pan}")
+    print(f"  Vencimiento   : {STARTER_CARD.expiry_mmYY}")
+    print(f"  CVV           : {STARTER_CARD.cvv}")
+    print(f"  Saldo inicial : ${STARTER_ACCOUNT.posted_minor/100:,.2f} MXN")
+    print(line)
+    print(f"  >>> Abre en tu browser:  http://{host}:{port}/")
+    print(f"      La tarjeta ya aparece cargada. Solo escribe el monto y")
+    print(f"      dale 'Cobrar'.")
+    print(line)
     ThreadingHTTPServer((host, port), Handler).serve_forever()
 
 
