@@ -18,6 +18,7 @@ DEMOS = {
     "e2e":      "demos.e2e",
     "stripe":   "demos.compare_stripe",
     "stripe-real": "demos.stripe_real",
+    "stripe-issuing": "demos.stripe_issuing",
 }
 
 
